@@ -16,6 +16,10 @@
 #' greedy_knapsack(x,W)
 
 greedy_knapsack <- function(x, W) {
+  if (W < 0){
+    stop("Capacity cannot be negative!")
+  }
+  
   # Calculate the ratio
   x$value_per_weight <- x$v / x$w
   
