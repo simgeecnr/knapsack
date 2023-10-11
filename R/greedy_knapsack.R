@@ -42,11 +42,12 @@ greedy_knapsack <- function(x, W) {
       # Take a fraction of the item
       fraction <- remaining_capacity / x$w[i]
       knapsack[i] <- fraction
-      total_value <- total_value + fraction * x$v[i]
       remaining_capacity <- 0
     }
   }
   
-  selected <- which(knapsack == 1)
-  return(list(value = total_value, elements = selected))
+  selected <- max(which(knapsack == 1))
+  selected_idx <- (rownames(x))[1:selected]
+  selected_idx <- as.numeric(selected_idx)
+  return(list(value = total_value, elements = selected_idx))
 }
