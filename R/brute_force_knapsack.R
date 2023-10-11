@@ -63,10 +63,24 @@ brute_force_knapsack <- function(x, W, parallel=FALSE){
 
 #=== Parallel Section ===============================
   if(parallel){
-    switch(Sys.info()[['sysname']],
-           Windows= {print("Parallel is function is not implemented for Windows yet")},
-           Linux  = {print("Parallel is function is not implemented for Linux yet")},
-           Darwin = {print("Parallel is function is not implemented for Mac yet")})
+    #Source Detect OS: https://stackoverflow.com/questions/4463087/detecting-operating-system-in-r-e-g-for-adaptive-rprofile-files
+    # switch(Sys.info()[['sysname']],
+    #        Windows= {
+    #          source(parallel)
+    #          print("--- Starting to run Parallel for Windows code: ---")
+    #          nCores <- parallel::detectCores()
+    #          cat("Number of cores detected:", nCores, "\n")
+    #          
+    #          cl <- makeClusters(nCores)
+    #          #combinations is my list of all the bin_rep that needs to be calculated
+    #          
+    #          
+    #          
+    #          stopCluster(cl)
+    #          
+    #        },
+    #        Linux  = {print("Parallel is function is not implemented for Linux yet")},
+    #        Darwin = {print("Parallel is function is not implemented for Mac yet")})
     answer <- 0
   }
 #=== Brute Force Section ============================
