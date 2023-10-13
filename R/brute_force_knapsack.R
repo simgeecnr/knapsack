@@ -46,21 +46,7 @@ brute_force_knapsack <- function(x, W, parallel=FALSE){
       tot_weight <- tot_weight + weight
       tot_value <- tot_value + value
     }
-    return(c(weight = round(tot_weight,0),value = round(tot_value,0), bin_rep = bin_rep))
-  }
-  
-  find_max_value_subset <- function(subset, W) {
-    max_value <- -Inf
-    max_id <- NULL
-    for (vec in subset) {
-      if (vec[1] <= W) {
-        if (vec[2] > max_value) {
-          max_value <- vec[2]
-          max_id <- vec[3]
-        }
-      }
-    }
-    return(list(max_value, max_id))
+    return(c(weight = round(tot_weight,0), value = round(tot_value,0), bin_rep = bin_rep))
   }
   
   if(parallel){
@@ -77,18 +63,19 @@ brute_force_knapsack <- function(x, W, parallel=FALSE){
              
              nCores <- parallel::detectCores() #Leave out one core for safety
              cat("Number of cores detected:", nCores, "\n")
-             cat("Running parallelism on", nCores-1,"cores. \n")
              
              #Create the cluster, necessary for the %dopar%, keep 1 core for safety
-             cl <- parallel::makeCluster(nCores-1)
+             cl <- parallel::makeCluster(nCores)
              
              #register the cluster
              doParallel::registerDoParallel(cl = cl)
              
+             #print(foreach::getDoParRegistered())
+             
              # -- Parallel For each --
              para_work <- foreach(
                i = 1:(2^(length(x$v))-1),
-               .combine = 'rbind' #options : c, cbind, rbind, list? , ...?
+               .combine = 'data.frame' #options : c, cbind, rbind, list , data.frame?
              ) %dopar% {
                   # Calculate the binary representation
                   binary <- intToBits(i)
@@ -98,33 +85,79 @@ brute_force_knapsack <- function(x, W, parallel=FALSE){
                   #Get de combination information (weight, value, bin_rep)
                   g <- get_comb_info(bin_rep, x)
              }
-             #print(as.data.frame(para_work))
-             para_work_df <- as.data.frame(para_work)
-             print(which(max(para_work_df$weight)))
-             print(para_work_df[1,])
-             print(typeof(para_work[1,]))
-             para_work_split <- split(para_work, rep(1:(nCores - 1), length.out = length(para_work)))
+             parallel::stopCluster(cl = cl)
+             #print(para_work)
+             #max_value_id <- find_max_value_row(para_work_df, W)
+             print(para_work)
              
-             #Find max using "divide and conquer" parallel
-             results <- parLapply(para_work_split, find_max_value_subset, W = W, cl = cl)
+             #Filter out the results where the weight is above the maximum allowed weight
+             filtered_df <- para_work[para_work$weight <= W, ]
+             print(filtered_df)
              
-             parallel:stopCluster(cl)
+             #Find the row with the maximum value
+             maxValueRowIndex <- which.max(filtered_df$value)
+             maxValueID <- filtered_df$bin_rep[maxValueRowIndex]
+             print(maxValueID)
              
-             max_value <- -Inf
-             max_id <- NULL
-             for (result in results) {
-               if (result[[1]] > max_value) {
-                 max_value <- result[[1]]
-                 max_id <- result[[2]]
-               }
+             #Get the information about the best combination
+             answer_obj <- get_comb_info(bin_rep = maxValueID, x)
+             max_value <- as.numeric(answer_obj[2])
+             max_value_elements <- get_element_idx(answer_obj[3])
+             answer <- list(value = round(as.numeric(max_value), 0), elements = max_value_elements)
+             },
+           Linux  = {print("Parallel is function is not implemented for Linux yet")
+             answer <- 0
+             },
+           Darwin = {print("Parallel is function is not implemented for Mac yet")
+             #Parallel workflow source : https://www.blasbenito.com/post/02_parallelizing_loops_with_r/
+             
+             library(parallel)
+             library(doParallel)
+             
+             nCores <- parallel::detectCores() #Leave out one core for safety
+             cat("Number of cores detected:", nCores, "\n")
+             
+             #Create the cluster, necessary for the %dopar%, keep 1 core for safety
+             cl <- parallel::makeCluster(nCores)
+             
+             #register the cluster
+             doParallel::registerDoParallel(cl = cl)
+             
+             #print(foreach::getDoParRegistered())
+             
+             # -- Parallel For each --
+             para_work <- foreach(
+               i = 1:(2^(length(x$v))-1),
+               .combine = 'data.frame' #options : c, cbind, rbind, list , data.frame?
+             ) %dopar% {
+               # Calculate the binary representation
+               binary <- intToBits(i)
+               binary <- as.integer(binary)
+               bin_rep <- paste(binary, collapse = "")
+               
+               #Get de combination information (weight, value, bin_rep)
+               g <- get_comb_info(bin_rep, x)
              }
+             parallel::stopCluster(cl = cl)
+             #print(para_work)
+             #max_value_id <- find_max_value_row(para_work_df, W)
+             print(para_work)
              
-             cat("The ID of the vector with the maximum value under weight", W, "is", max_id, "\n")
+             #Filter out the results where the weight is above the maximum allowed weight
+             filtered_df <- para_work[para_work$weight <= W, ]
+             print(filtered_df)
              
-           },
-           Linux  = {print("Parallel is function is not implemented for Linux yet")},
-           Darwin = {print("Parallel is function is not implemented for Mac yet")})
-    answer <- 0
+             #Find the row with the maximum value
+             maxValueRowIndex <- which.max(filtered_df$value)
+             maxValueID <- filtered_df$bin_rep[maxValueRowIndex]
+             print(maxValueID)
+             
+             #Get the information about the best combination
+             answer_obj <- get_comb_info(bin_rep = maxValueID, x)
+             max_value <- as.numeric(answer_obj[2])
+             max_value_elements <- get_element_idx(answer_obj[3])
+             answer <- list(value = round(as.numeric(max_value), 0), elements = max_value_elements)
+             })
   }
 
   else{
@@ -148,8 +181,8 @@ brute_force_knapsack <- function(x, W, parallel=FALSE){
       #Get the weight of the combinations of items
       new_res <- get_comb_info(comb, x)
       #Check if it is a better option
-      if(new_res[2] > max_value && new_res[1] <= W){
-        max_value <- new_res[2]
+      if(as.numeric(new_res[2]) > max_value && as.numeric(new_res[1]) <= W){
+        max_value <- as.numeric(new_res[2])
         max_value_elements <- get_element_idx(comb)
       }
     }
