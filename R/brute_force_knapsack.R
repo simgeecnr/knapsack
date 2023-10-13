@@ -10,26 +10,14 @@
 #' @examples
 
 brute_force_knapsack <- function(x, W, parallel=FALSE){
+  
+  #=== Input Check =========
   #The function should check that the inputs are correct (i.e. a data.frame with two variables v and w)
   #with only positive values.
   stopifnot(W >= 0)
   stopifnot(is.data.frame(x))
   stopifnot("v" %in% colnames(x) && "w" %in% colnames(x))
-  
-  #N being the number of options to put in the bag 
-  #Create a list with all the binaries of the numbers between 1 and N, 
-  # intToBits(n) returns a list of 32 0/1 for the binary rep of n, from left to right. the list is indexable
-  #2^32 = 4294967296 , the max number of options that this algo can handle
-  
-#=== Initialize all the possible combinations========
-  combinations <- c()
-  for (i in 1:2^(length(x$v))){ #Generate all 2^N combinations
-    binary <- intToBits(i)
-    binary <- as.integer(binary)
-    bin_rep <- paste(binary, collapse = "")
-    combinations <- append(combinations, bin_rep)
-  }
-  combinations <- head(combinations, -1) #Get rid of the last combination (overflow !)
+
 
 #=== Helper functions================================
   get_element_idx <- function(bin_rep){
@@ -58,39 +46,104 @@ brute_force_knapsack <- function(x, W, parallel=FALSE){
       tot_weight <- tot_weight + weight
       tot_value <- tot_value + value
     }
-    return(c(tot_weight, tot_value))
+    return(c(weight = round(tot_weight,0),value = round(tot_value,0), bin_rep = bin_rep))
   }
-
-#=== Parallel Section ===============================
+  
+  find_max_value_subset <- function(subset, W) {
+    max_value <- -Inf
+    max_id <- NULL
+    for (vec in subset) {
+      if (vec[1] <= W) {
+        if (vec[2] > max_value) {
+          max_value <- vec[2]
+          max_id <- vec[3]
+        }
+      }
+    }
+    return(list(max_value, max_id))
+  }
+  
   if(parallel){
+    #=== Parallel Section ===============================
+    print("Parallel selected")
     #Source Detect OS: https://stackoverflow.com/questions/4463087/detecting-operating-system-in-r-e-g-for-adaptive-rprofile-files
-    # switch(Sys.info()[['sysname']],
-    #        Windows= {
-    #          source(parallel)
-    #          print("--- Starting to run Parallel for Windows code: ---")
-    #          nCores <- parallel::detectCores()
-    #          cat("Number of cores detected:", nCores, "\n")
-    #          
-    #          cl <- makeClusters(nCores)
-    #          #combinations is my list of all the bin_rep that needs to be calculated
-    #          
-    #          
-    #          
-    #          stopCluster(cl)
-    #          
-    #        },
-    #        Linux  = {print("Parallel is function is not implemented for Linux yet")},
-    #        Darwin = {print("Parallel is function is not implemented for Mac yet")})
+    switch(Sys.info()[['sysname']],
+           Windows= {
+             print("--- Starting to run Parallel for Windows code: ---")
+             #Parallel workflow source : https://www.blasbenito.com/post/02_parallelizing_loops_with_r/
+             
+             library(parallel)
+             library(doParallel)
+             
+             nCores <- parallel::detectCores() #Leave out one core for safety
+             cat("Number of cores detected:", nCores, "\n")
+             cat("Running parallelism on", nCores-1,"cores. \n")
+             
+             #Create the cluster, necessary for the %dopar%, keep 1 core for safety
+             cl <- parallel::makeCluster(nCores-1)
+             
+             #register the cluster
+             doParallel::registerDoParallel(cl = cl)
+             
+             # -- Parallel For each --
+             para_work <- foreach(
+               i = 1:(2^(length(x$v))-1),
+               .combine = 'rbind' #options : c, cbind, rbind, list? , ...?
+             ) %dopar% {
+                  # Calculate the binary representation
+                  binary <- intToBits(i)
+                  binary <- as.integer(binary)
+                  bin_rep <- paste(binary, collapse = "")
+                  
+                  #Get de combination information (weight, value, bin_rep)
+                  g <- get_comb_info(bin_rep, x)
+             }
+             #print(as.data.frame(para_work))
+             para_work_df <- as.data.frame(para_work)
+             print(which(max(para_work_df$weight)))
+             print(para_work_df[1,])
+             print(typeof(para_work[1,]))
+             para_work_split <- split(para_work, rep(1:(nCores - 1), length.out = length(para_work)))
+             
+             #Find max using "divide and conquer" parallel
+             results <- parLapply(para_work_split, find_max_value_subset, W = W, cl = cl)
+             
+             parallel:stopCluster(cl)
+             
+             max_value <- -Inf
+             max_id <- NULL
+             for (result in results) {
+               if (result[[1]] > max_value) {
+                 max_value <- result[[1]]
+                 max_id <- result[[2]]
+               }
+             }
+             
+             cat("The ID of the vector with the maximum value under weight", W, "is", max_id, "\n")
+             
+           },
+           Linux  = {print("Parallel is function is not implemented for Linux yet")},
+           Darwin = {print("Parallel is function is not implemented for Mac yet")})
     answer <- 0
   }
-#=== Brute Force Section ============================
-  #loop through the list and test if each combination yield a better answer using the binary rep as indexing reference for the possible items
-  #print(length(combinations))
-  #Create a max_value variable to store the best found option, and a max_value_elements variable to store how to reach that best option (store the binary rep)
+
   else{
+    #=== Brute Force Section ============================
+    
+    #--- Initialize all the possible combinations ------
+    combinations <- c()
+    for (i in 1:2^(length(x$v))){ #Generate all 2^N -1 combinations
+      binary <- intToBits(i)
+      binary <- as.integer(binary)
+      bin_rep <- paste(binary, collapse = "")
+      combinations <- append(combinations, bin_rep)
+    }
+    combinations <- head(combinations, -1) #Get rid of the last combination (overflow !)
+    #--- Set the best option to taking No item ----------
     max_value <- 0
     max_value_elements <- intToBits(0)
     
+    #--- Calculate every possible combination --------
     for (comb in combinations){
       #Get the weight of the combinations of items
       new_res <- get_comb_info(comb, x)
