@@ -16,3 +16,14 @@ knitr::opts_chunk$set(
 )
 ```
 
+
+```{r}
+library(knapsack)
+```
+
+```{r}
+x <- data.frame(v = c(10, 5, 15, 7, 6, 18), w = c(2, 3, 5, 7, 1, 4))
+W <- 15
+knapsack_dynamic(x,W)
+```
+
