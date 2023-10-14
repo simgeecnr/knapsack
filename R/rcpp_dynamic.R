@@ -15,7 +15,7 @@
 #' knapsack_dynamic_cpp(x,W)
 
 library(Rcpp)
-cppFunction('
+knapsack_dynamic_cpp <- cppFunction('
 List knapsack_dynamic_cpp(NumericMatrix x, int W) {
   int n = x.nrow();
   NumericMatrix m(n + 1, W + 1);

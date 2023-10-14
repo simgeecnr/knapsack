@@ -16,9 +16,10 @@
 #' knapsack_dynamic(x,W, fast = TRUE)
 
 knapsack_dynamic <- function(x, W, fast = FALSE){
-  source("R/rcpp_dynamic.R")
+  #source("R/rcpp_dynamic.R")
   if (fast){
     x <- as.matrix(x)
+    #source("R/rcpp_dynamic.R")
     knapsack_dynamic_cpp(x, W)
   }
   #Initialize the matrix
