@@ -53,7 +53,7 @@ result
 # DYNAMMIC PROGRAMMING
 
 ```{r}
-x <- knapsack_objects[1:500,]
+x <- knapsack_objects[1:50,]
 W <- 3500
 ```
 

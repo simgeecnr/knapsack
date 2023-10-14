@@ -1,5 +1,5 @@
 #' Dynammic Programming for Knapsack Problem with RCPP
-#'
+#' 
 #' @description The algorithm solves the knapsack problem using Dynammic Programming approach with RCPP. 
 #' @param x 
 #' @param W 
@@ -9,13 +9,12 @@
 #' @export
 #'
 #' @examples
-#' x <- data.frame(v = c(10, 5, 15, 7, 6, 18), w = c(2, 3, 5, 7, 1, 4))
+#' x <- data.frame(w = c(2, 3, 5, 7, 1, 4), v = c(10, 5, 15, 7, 6, 18))
 #' x <- as.matrix(x)
 #' W <- 15
 #' knapsack_dynamic_cpp(x,W)
 
-library(Rcpp)
-knapsack_dynamic_cpp <- cppFunction('
+Rcpp::cppFunction('
 List knapsack_dynamic_cpp(NumericMatrix x, int W) {
   int n = x.nrow();
   NumericMatrix m(n + 1, W + 1);
@@ -59,3 +58,17 @@ List knapsack_dynamic_cpp(NumericMatrix x, int W) {
   return result;
 }
 ')
+
+# RNGversion(min(as.character(getRversion()),"3.5.3"))
+# set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
+# n <- 2000
+# knapsack_objects <-
+#   data.frame(
+#     w=sample(1:4000, size = n, replace = TRUE),
+#     v=runif(n = n, 0, 10000)
+#   )
+# 
+# x <- as.matrix(knapsack_objects[1:20,])
+# W <- 3500
+# knapsack_dynamic_cpp(x, W)
+

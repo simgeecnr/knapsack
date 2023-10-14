@@ -19,3 +19,8 @@ returns the maximum knapsack value and which elements (rows in the data.frame).
 \description{
 Knapsack Brute Force
 }
+\examples{
+x <- data.frame(v = c(10, 5, 15, 7, 6, 18), w = c(2, 3, 5, 7, 1, 4))
+W <- 15
+brute_force_knapsack(x,W)
+}
