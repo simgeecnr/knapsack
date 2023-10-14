@@ -16,7 +16,8 @@
 #' knapsack_dynamic(x,W, fast = TRUE)
 
 knapsack_dynamic <- function(x, W, fast = FALSE){
-  source("R/rcpp_dynamic.R")
+  #setwd("..")  
+  source("/Users/simgecinar/Desktop/knapsack/R/rcpp_dynamic.R")
   if (fast){
     x <-as.matrix(x)
     knapsack_dynamic_cpp(x, W)
