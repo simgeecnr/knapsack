@@ -16,10 +16,10 @@
 #' knapsack_dynamic(x,W, fast = TRUE)
 
 knapsack_dynamic <- function(x, W, fast = FALSE){
-  source("R/rcpp_dynamic.R")
+  #source("R/rcpp_dynamic.R")
   if (fast){
-    x <- as.matrix(x)
-    results <- Rcpp::cppFunction('
+    
+    Rcpp::cppFunction('
 List knapsack_dynamic_cpp(NumericMatrix x, int W) {
   int n = x.nrow();
   NumericMatrix m(n + 1, W + 1);
@@ -63,7 +63,9 @@ List knapsack_dynamic_cpp(NumericMatrix x, int W) {
   return result;
 }
 ')
-    return(results)
+    x <- as.matrix(x)
+    answer <- knapsack_dynamic_cpp(x, W)
+    return(answer)
   }
   else{
     #Initialize the matrix
@@ -71,12 +73,12 @@ List knapsack_dynamic_cpp(NumericMatrix x, int W) {
     m <- matrix(0, n+1, W+1)
     
     #Filling the matrix by calculating the values
-    for (i in 2:(n+1)) { 
-      for (j in 2:(W+1)) { 
-        if (x[i-1, 'w'] > j) {
-          m[i, j] <- m[i-1, j] 
+    for (i in 2:(n + 1)) { 
+      for (j in 2:(W + 1)) { 
+        if (x[i - 1, 'w'] > j) {
+          m[i, j] <- m[i - 1, j] 
         } else {
-          m[i, j] <- max(m[i-1, j], m[i-1, j - x[i-1, 'w']] + x[i-1, 'v'])
+          m[i, j] <- max(m[i - 1, j], m[i - 1, j - x[i - 1, 'w']] + x[i - 1, 'v'])
         }
       }
     }
@@ -104,6 +106,15 @@ List knapsack_dynamic_cpp(NumericMatrix x, int W) {
     return(t)
   }
 }
+
+RNGversion(min(as.character(getRversion()),"3.5.3"))
+set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
+n <- 2000
+knapsack_objects <-
+  data.frame(
+    w=sample(1:4000, size = n, replace = TRUE),
+    v=runif(n = n, 0, 10000)
+  )
 
 knapsack_dynamic(x = knapsack_objects[1:20,], W = 3500)
 knapsack_dynamic(x = knapsack_objects[1:20,], W = 3500, fast = TRUE)
