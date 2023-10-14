@@ -21,8 +21,7 @@ Loading the necessary library
 library(knapsack)
 ```
 
-
-
+Generating data
 ```{r}
 RNGversion(min(as.character(getRversion()),"3.5.3"))
 set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
@@ -33,6 +32,24 @@ knapsack_objects <-
     v=runif(n = n, 0, 10000)
   )
 ```
+
+# BRUTE FORCE SEARCH
+
+```{r}
+x <- knapsack_objects[1:16,]
+W <- 3500
+```
+
+```{r}
+start_time <- Sys.time()
+result <- brute_force_knapsack(x,W)
+end_time <- Sys.time()
+runtime <- end_time - start_time
+cat("Runtime:", runtime, "seconds\n")
+```
+
+# DYNAMMIC PROGRAMMING
+
 ```{r}
 x <- knapsack_objects[1:500,]
 W <- 3500
@@ -52,6 +69,21 @@ result <- knapsack_dynamic(x, W, TRUE)
 end_time <- Sys.time()
 runtime <- end_time - start_time
 cat("Runtime with rcpp:", runtime, "seconds\n")
+```
+
+# GREEDY HEURISTIC
+
+```{r}
+x <- knapsack_objects[1:1000000,]
+W <- 3500
+```
+
+```{r}
+start_time <- Sys.time()
+result <- greedy_knapsack(x,W)
+end_time <- Sys.time()
+runtime <- end_time - start_time
+cat("Runtime:", runtime, "seconds\n")
 ```
 
 
