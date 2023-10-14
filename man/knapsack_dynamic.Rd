@@ -10,6 +10,8 @@ knapsack_dynamic(x, W, fast = FALSE)
 \item{x}{}
 
 \item{W}{}
+
+\item{fast}{An optional logical value to use rcpp (default is FALSE)}
 }
 \value{
 It returns the maximum value obtained and selected items.

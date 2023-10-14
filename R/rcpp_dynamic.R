@@ -1,4 +1,4 @@
-#' Dynammic Programming for Knapsack Problem
+#' Dynammic Programming for Knapsack Problem with RCPP
 #'
 #' @description The algorithm solves the knapsack problem using Dynammic Programming approach with RCPP. 
 #' @param x 
@@ -9,11 +9,10 @@
 #' @export
 #'
 #' @examples
-#' x <- data.frame(w = c(2, 3, 5, 7, 1, 4), v = c(10, 5, 15, 7, 6, 18))
+#' x <- data.frame(v = c(10, 5, 15, 7, 6, 18), w = c(2, 3, 5, 7, 1, 4))
 #' x <- as.matrix(x)
 #' W <- 15
 #' knapsack_dynamic_cpp(x,W)
-#' knapsack_dynamic_cpp(x,W, fast = TRUE)
 
 library(Rcpp)
 cppFunction('

@@ -47,6 +47,7 @@ result <- brute_force_knapsack(x,W)
 end_time <- Sys.time()
 runtime <- end_time - start_time
 cat("Runtime:", runtime, "seconds\n")
+result
 ```
 
 # DYNAMMIC PROGRAMMING
@@ -58,18 +59,20 @@ W <- 3500
 
 ```{r}
 start_time <- Sys.time()
-result <- knapsack_dynamic(x = knapsack_objects[1:500,], W = 3500)
+result <- knapsack_dynamic(x, W)
 end_time <- Sys.time()
 runtime <- end_time - start_time
 cat("Runtime without rcpp:", runtime, "seconds\n")
+result
 ```
 
 ```{r}
 start_time <- Sys.time()
-result <- knapsack_dynamic(x = knapsack_objects[1:500,], W = 3500, fast = TRUE)
+result <- knapsack_dynamic(x, W, TRUE)
 end_time <- Sys.time()
 runtime <- end_time - start_time
 cat("Runtime with rcpp:", runtime, "seconds\n")
+result
 ```
 
 # GREEDY HEURISTIC
@@ -85,6 +88,7 @@ result <- greedy_knapsack(x,W)
 end_time <- Sys.time()
 runtime <- end_time - start_time
 cat("Runtime:", runtime, "seconds\n")
+result
 ```
 
 

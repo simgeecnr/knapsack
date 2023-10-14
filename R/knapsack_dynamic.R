@@ -4,7 +4,7 @@
 #' Its computational complexity is O(Wn).
 #' @param x 
 #' @param W 
-#'
+#' @param fast An optional logical value to use rcpp (default is FALSE)
 #' @return It returns the maximum value obtained and selected items.
 #' @seealso [Knapsack Problem](https://en.wikipedia.org/wiki/Knapsack_problem#0.2F1_knapsack_problem)
 #' @export
@@ -17,9 +17,10 @@
 
 knapsack_dynamic <- function(x, W, fast = FALSE){
   #setwd("..")  
-  source("/Users/simgecinar/Desktop/knapsack/R/rcpp_dynamic.R")
+  #source("/Users/simgecinar/Desktop/knapsack/R/rcpp_dynamic.R")
+  source("rcpp_dynamic.R")
   if (fast){
-    x <-as.matrix(x)
+    x <- as.matrix(x)
     knapsack_dynamic_cpp(x, W)
   }
   #Initialize the matrix
@@ -70,4 +71,4 @@ knapsack_objects <-
   )
 
 # knapsack_dynamic(x = knapsack_objects[1:20,], W = 3500)
-# knapsack_dynamic(x = knapsack_objects[1:20,], W = 3500, fast = TRUE)
+knapsack_dynamic(x = knapsack_objects[1:20,], W = 3500, fast = TRUE)
