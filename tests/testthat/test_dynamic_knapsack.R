@@ -9,8 +9,10 @@ knapsack_objects <- data.frame(
   v=runif(n = n, 0, 10000)
 )
 
-#setwd("..")  
-source("/Users/simgecinar/Desktop/knapsack/R/rcpp_dynamic.R")
+
+setwd("../..")
+source("R/rcpp_dynamic.R")
+
 
 test_that("Correct object is returned", {
   expect_silent(dk <- knapsack_dynamic(x = knapsack_objects[1:8,], W = 3500))
