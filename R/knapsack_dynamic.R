@@ -13,8 +13,14 @@
 #' x <- data.frame(v = c(10, 5, 15, 7, 6, 18), w = c(2, 3, 5, 7, 1, 4))
 #' W <- 15
 #' knapsack_dynamic(x,W)
+#' knapsack_dynamic(x,W, fast = TRUE)
 
-knapsack_dynamic <- function(x, W){
+knapsack_dynamic <- function(x, W, fast = FALSE){
+  source("rcpp_dynamic.R")
+  if (fast){
+    x <-as.matrix(x)
+    knapsack_dynamic_cpp(x, W)
+  }
   #Initialize the matrix
   n <- nrow(x)
   m <- matrix(0, n+1, W+1)
@@ -29,7 +35,6 @@ knapsack_dynamic <- function(x, W){
       }
     }
   }
-  
   i <- n+1
   w <- W+1
   max_value <- m[i,w]
@@ -50,5 +55,6 @@ knapsack_dynamic <- function(x, W){
   }
   
   selected <- which(list_idx == 1)
-  return(list(value = max_value, elements = selected))
+  t <- list(value = max_value, elements = selected)
+  return(t)
 }

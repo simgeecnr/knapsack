@@ -1,5 +1,21 @@
-library(Rcpp)
+#' Dynammic Programming for Knapsack Problem
+#'
+#' @description The algorithm solves the knapsack problem using Dynammic Programming approach with RCPP. 
+#' @param x 
+#' @param W 
+#'
+#' @return It returns the maximum value obtained and selected items.
+#' @seealso [Knapsack Problem](https://en.wikipedia.org/wiki/Knapsack_problem#0.2F1_knapsack_problem)
+#' @export
+#'
+#' @examples
+#' x <- data.frame(w = c(2, 3, 5, 7, 1, 4), v = c(10, 5, 15, 7, 6, 18))
+#' x <- as.matrix(x)
+#' W <- 15
+#' knapsack_dynamic_cpp(x,W)
+#' knapsack_dynamic_cpp(x,W, fast = TRUE)
 
+library(Rcpp)
 cppFunction('
 List knapsack_dynamic_cpp(NumericMatrix x, int W) {
   int n = x.nrow();
