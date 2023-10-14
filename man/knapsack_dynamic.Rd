@@ -2,14 +2,14 @@
 % Please edit documentation in R/knapsack_dynamic.R
 \name{knapsack_dynamic}
 \alias{knapsack_dynamic}
-\title{Dynammic Programming for Knapsack Problem}
+\title{Dynamic Programming for Knapsack Problem}
 \usage{
 knapsack_dynamic(x, W, fast = FALSE)
 }
 \arguments{
-\item{x}{}
+\item{x}{a data.frame with two variables v (Value) and w (Weight) and returns the maximum knapsack value and which elements (rows in the data.frame).}
 
-\item{W}{}
+\item{W}{is the knapsack size.}
 
 \item{fast}{An optional logical value to use rcpp (default is FALSE)}
 }
@@ -17,11 +17,11 @@ knapsack_dynamic(x, W, fast = FALSE)
 It returns the maximum value obtained and selected items.
 }
 \description{
-The algorithm solves the knapsack problem using Dynammic Programming approach. 
+The algorithm solves the knapsack problem using Dynamic Programming approach. 
 Its computational complexity is O(Wn).
 }
 \examples{
-x <- data.frame(v = c(10, 5, 15, 7, 6, 18), w = c(2, 3, 5, 7, 1, 4))
+x <- data.frame(w = c(2, 3, 5, 7, 1, 4), v = c(10, 5, 15, 7, 6, 18))
 W <- 15
 knapsack_dynamic(x,W)
 knapsack_dynamic(x,W, fast = TRUE)

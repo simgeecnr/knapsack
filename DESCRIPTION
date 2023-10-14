@@ -5,7 +5,7 @@ Version: 1.0
 Date: 2023-10-11
 Author: Simge Cinar, Hugo Morvan
 Maintainer: Simge Cinar <simci637@student.liu.se>, Hugo Morvan <hugmo418@student.liu.se>
-Description: This package contains brute force search, dynammic programming and a greedy approach to solve the knapsack problem
+Description: This package contains brute force search, dynammic programming and a greedy approach to solve the knapsack problem.
 License: GPL (== 3.0) | file LICENSE
 Encoding: UTF-8
 Suggests: 

@@ -4,7 +4,7 @@ author: "Simge Cinar & Hugo Morvan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Knapsack Vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -67,7 +67,7 @@ result
 ```
 
 ```{r}
-setwd("..")  #THIS WORKS BUT CAUSES THE PROBLEMS WITH KNIT
+#setwd("..")  #THIS WORKS BUT CAUSES THE PROBLEMS WITH KNIT
 start_time <- Sys.time()
 result <- knapsack_dynamic(x, W, TRUE)
 end_time <- Sys.time()

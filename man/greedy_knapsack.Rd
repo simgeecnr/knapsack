@@ -7,9 +7,9 @@
 greedy_knapsack(x, W)
 }
 \arguments{
-\item{x}{}
+\item{x}{a data.frame with two variables v (Value) and w (Weight) and returns the maximum knapsack value and which elements (rows in the data.frame).}
 
-\item{W}{}
+\item{W}{is the knapsack size.}
 }
 \value{
 It returns the maximum value obtained and selected items.

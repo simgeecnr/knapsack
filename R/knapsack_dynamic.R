@@ -1,9 +1,9 @@
-#' Dynammic Programming for Knapsack Problem
+#' Dynamic Programming for Knapsack Problem
 #'
-#' @description The algorithm solves the knapsack problem using Dynammic Programming approach. 
+#' @description The algorithm solves the knapsack problem using Dynamic Programming approach. 
 #' Its computational complexity is O(Wn).
-#' @param x 
-#' @param W 
+#' @param x a data.frame with two variables v (Value) and w (Weight) and returns the maximum knapsack value and which elements (rows in the data.frame).
+#' @param W is the knapsack size.
 #' @param fast An optional logical value to use rcpp (default is FALSE)
 #' @return It returns the maximum value obtained and selected items.
 #' @seealso [Knapsack Problem](https://en.wikipedia.org/wiki/Knapsack_problem#0.2F1_knapsack_problem)
@@ -16,10 +16,9 @@
 #' knapsack_dynamic(x,W, fast = TRUE)
 
 knapsack_dynamic <- function(x, W, fast = FALSE){
-  #source("R/rcpp_dynamic.R")
   if (fast){
     
-    Rcpp::cppFunction('
+    knapsack_dynamic_cpp <- Rcpp::cppFunction('
 List knapsack_dynamic_cpp(NumericMatrix x, int W) {
   int n = x.nrow();
   NumericMatrix m(n + 1, W + 1);
@@ -106,15 +105,3 @@ List knapsack_dynamic_cpp(NumericMatrix x, int W) {
     return(t)
   }
 }
-
-RNGversion(min(as.character(getRversion()),"3.5.3"))
-set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
-n <- 2000
-knapsack_objects <-
-  data.frame(
-    w=sample(1:4000, size = n, replace = TRUE),
-    v=runif(n = n, 0, 10000)
-  )
-
-knapsack_dynamic(x = knapsack_objects[1:20,], W = 3500)
-knapsack_dynamic(x = knapsack_objects[1:20,], W = 3500, fast = TRUE)

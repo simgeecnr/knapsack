@@ -4,14 +4,12 @@
 \alias{brute_force_knapsack}
 \title{Knapsack Brute Force}
 \usage{
-brute_force_knapsack(x, W, parallel = FALSE)
+brute_force_knapsack(x, W)
 }
 \arguments{
 \item{x}{a data.frame with two variables v (Value) and w (Weight) and returns the maximum knapsack value and which elements (rows in the data.frame).}
 
 \item{W}{is the knapsack size.}
-
-\item{parallel}{Default: False. Use paralleling to solve problem}
 }
 \value{
 returns the maximum knapsack value and which elements (rows in the data.frame).

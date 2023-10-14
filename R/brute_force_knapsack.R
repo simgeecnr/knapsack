@@ -2,7 +2,6 @@
 #'
 #' @param x a data.frame with two variables v (Value) and w (Weight) and returns the maximum knapsack value and which elements (rows in the data.frame).
 #' @param W is the knapsack size.
-#' @param parallel Default: False. Use paralleling to solve problem
 #'
 #' @return returns the maximum knapsack value and which elements (rows in the data.frame).
 #' @export
@@ -35,7 +34,6 @@ brute_force_knapsack <- function(x, W){
     }
     return(indexes)
   }
-  
   get_comb_info <- function(bin_rep, x){
     #given a bin_rep and a dataframe with v and w , returns the value and weight of the specified combination of items
     indexes <- get_element_idx(bin_rep)
@@ -49,7 +47,6 @@ brute_force_knapsack <- function(x, W){
     }
     return(c(weight = tot_weight, value = tot_value, bin_rep = bin_rep))
   }
-  
   find_bin_rep <- function(df, max_weight) {
     result <- df[, "result"]
     result["value"] <- as.numeric(result["value"])
@@ -58,7 +55,6 @@ brute_force_knapsack <- function(x, W){
     bin_rep_for_max_value <- max_value_row["bin_rep"]
     return(bin_rep_for_max_value)
   }
-  
   recursive_knap <- function(i, left_idx, right_idx, x, W){
     #i is my vector from 1:2^N
     if(left_idx == right_idx){

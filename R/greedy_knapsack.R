@@ -3,8 +3,8 @@
 #' @description The algorithm solves the knapsack problem using Greedy approach. Its computational 
 #' complexity is O(n*log(n))
 #' 
-#' @param x 
-#' @param W 
+#' @param x a data.frame with two variables v (Value) and w (Weight) and returns the maximum knapsack value and which elements (rows in the data.frame).
+#' @param W is the knapsack size.
 #'
 #' @return It returns the maximum value obtained and selected items.
 #' @seealso [Knapsack Problem](https://en.wikipedia.org/wiki/Knapsack_problem#Greedy_approximation_algorithm)
