@@ -68,5 +68,5 @@ knapsack_objects <-
     v=runif(n = n, 0, 10000)
   )
 
-knapsack_dynamic(x = knapsack_objects[1:20,], W = 3500)
-knapsack_dynamic(x = knapsack_objects[1:20,], W = 3500, fast = TRUE)
+# knapsack_dynamic(x = knapsack_objects[1:20,], W = 3500)
+# knapsack_dynamic(x = knapsack_objects[1:20,], W = 3500, fast = TRUE)
