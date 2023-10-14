@@ -12,6 +12,8 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
+Imports:
+    Rcpp
 VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
 Depends: 

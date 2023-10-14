@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 Loading the necessary library
 ```{r}
 library(knapsack)
+library(Rcpp)
 ```
 
 Generating data
@@ -57,7 +58,7 @@ W <- 3500
 
 ```{r}
 start_time <- Sys.time()
-result <- knapsack_dynamic(x,W)
+result <- knapsack_dynamic(x = knapsack_objects[1:500,], W = 3500)
 end_time <- Sys.time()
 runtime <- end_time - start_time
 cat("Runtime without rcpp:", runtime, "seconds\n")
@@ -65,7 +66,7 @@ cat("Runtime without rcpp:", runtime, "seconds\n")
 
 ```{r}
 start_time <- Sys.time()
-result <- knapsack_dynamic(x, W, TRUE)
+result <- knapsack_dynamic(x = knapsack_objects[1:500,], W = 3500, fast = TRUE)
 end_time <- Sys.time()
 runtime <- end_time - start_time
 cat("Runtime with rcpp:", runtime, "seconds\n")
