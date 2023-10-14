@@ -38,6 +38,7 @@ brute_force_knapsack <- function(x, W, parallel=FALSE){
   get_comb_info <- function(bin_rep, x){
     #given a bin_rep and a dataframe with v and w , returns the value and weight of the specified combination of items
     indexes <- get_element_idx(bin_rep)
+    print(indexes)
     tot_value <- 0
     tot_weight <- 0
     for (i in 1:length(indexes)){
@@ -46,7 +47,57 @@ brute_force_knapsack <- function(x, W, parallel=FALSE){
       tot_weight <- tot_weight + weight
       tot_value <- tot_value + value
     }
-    return(c(weight = round(tot_weight,0), value = round(tot_value,0), bin_rep = bin_rep))
+    cat("weight:", tot_weight, "value:", tot_value, "\n")
+    return(c(weight = tot_weight, value = tot_value, bin_rep = bin_rep))
+  }
+  
+  find_bin_rep <- function(df, max_weight) {
+    result <- df[, "result"]
+    result["value"] <- as.numeric(result["value"])
+    subset_df <- result[result["weight"] <= max_weight, ]
+    max_value_row <- subset_df[which.max(subset_df["value"]), ]
+    bin_rep_for_max_value <- max_value_row["bin_rep"]
+    return(bin_rep_for_max_value)
+  }
+  
+  recursive_knap <- function(i, left_idx, right_idx, x, W){
+    #i is my vector from 1:2^N
+    if(left_idx == right_idx){
+      cat("i =", i[left_idx], "\n")
+      #Convert i to binary
+      binary <- as.integer(intToBits(i[left_idx]))
+      bin_rep <- paste(binary, collapse = "")
+      #Fetch the infos
+      info <- get_comb_info(bin_rep, x)
+      #print(info)
+      if(as.numeric(info[1]) <= W){ #Check if solution is under weight limit
+        return(info)
+      }
+      else{
+        #cat("Too Heavy", info[1], "\n")
+        return(c(weight = 0,value = 0,bin_rep = 0))
+      }
+    }
+    else{
+      middle <- (left_idx+right_idx)%/%2
+      
+      left_info <- recursive_knap(i, left_idx, middle, x, W)
+      right_info <- recursive_knap(i, middle+1, right_idx, x, W)
+      
+      #Calculate the max of left and right
+      left_max_value <- as.numeric(left_info[2])
+      
+      right_max_value <- as.numeric(right_info[2])
+      #cat("Left:", left_max_value, "Right;", right_max_value, "\n")
+      #return the max value
+      if(left_max_value > right_max_value){
+        #cat("returning left \n \n")
+        return(left_info)
+      }else{
+        #cat("returning right \n \n ")
+        return(right_info)
+      }
+    }
   }
   
   if(parallel){
@@ -71,39 +122,21 @@ brute_force_knapsack <- function(x, W, parallel=FALSE){
              doParallel::registerDoParallel(cl = cl)
              
              #print(foreach::getDoParRegistered())
-             
+             n <- (2^(length(x$v))-1)
+             cat("Number of combinations:", n, "\n")
              # -- Parallel For each --
-             para_work <- foreach(
-               i = 1:(2^(length(x$v))-1),
-               .combine = 'data.frame' #options : c, cbind, rbind, list , data.frame?
+             result <- foreach(
+               i = 1:(2^(length(x$v))-1)
              ) %dopar% {
-                  # Calculate the binary representation
-                  binary <- intToBits(i)
-                  binary <- as.integer(binary)
-                  bin_rep <- paste(binary, collapse = "")
-                  
-                  #Get de combination information (weight, value, bin_rep)
-                  g <- get_comb_info(bin_rep, x)
+               print("spawn")
+               recursive_knap(i = i, left_idx = 1, right_idx = n, x = x, W = W)
              }
              parallel::stopCluster(cl = cl)
-             #print(para_work)
-             #max_value_id <- find_max_value_row(para_work_df, W)
-             print(para_work)
-             
-             #Filter out the results where the weight is above the maximum allowed weight
-             filtered_df <- para_work[para_work$weight <= W, ]
-             print(filtered_df)
-             
-             #Find the row with the maximum value
-             maxValueRowIndex <- which.max(filtered_df$value)
-             maxValueID <- filtered_df$bin_rep[maxValueRowIndex]
-             print(maxValueID)
-             
-             #Get the information about the best combination
-             answer_obj <- get_comb_info(bin_rep = maxValueID, x)
-             max_value <- as.numeric(answer_obj[2])
-             max_value_elements <- get_element_idx(answer_obj[3])
-             answer <- list(value = round(as.numeric(max_value), 0), elements = max_value_elements)
+             print(result)
+             #max_value <- as.numeric(result[2])
+             #max_value_elements <- get_element_idx(result[1])
+             answer <- c(weight = 0,value = 0,bin_rep = 0)
+             #answer <- list(value = round(max_value, 0), elements = max_value_elements)
              },
            Linux  = {print("Parallel is function is not implemented for Linux yet")
              answer <- 0
@@ -177,17 +210,22 @@ brute_force_knapsack <- function(x, W, parallel=FALSE){
     max_value_elements <- intToBits(0)
     
     #--- Calculate every possible combination --------
-    for (comb in combinations){
-      #Get the weight of the combinations of items
-      new_res <- get_comb_info(comb, x)
-      #Check if it is a better option
-      if(as.numeric(new_res[2]) > max_value && as.numeric(new_res[1]) <= W){
-        max_value <- as.numeric(new_res[2])
-        max_value_elements <- get_element_idx(comb)
-      }
-    }
+    # for (comb in combinations){
+    #   #Get the weight of the combinations of items
+    #   new_res <- get_comb_info(comb, x)
+    #   #Check if it is a better option
+    #   if(as.numeric(new_res[2]) > max_value && as.numeric(new_res[1]) <= W){
+    #     max_value <- as.numeric(new_res[2])
+    #     max_value_elements <- get_element_idx(comb)
+    #   }
+    # }
+    # 
+    n <- (2^(length(x$v))-1)
+    info <- recursive_knap(c(1:n),left_idx=1, right_idx=n, x=x, W=W)
+    max_value <- as.numeric(info[2])
+    max_value_elements <- get_element_idx(info[3])
     #I dont know why but values have decimals, so I round the number to get rid of the issue
-    answer <- list(value = round(max_value, 0), elements = max_value_elements)
+    answer <- list(weight = as.numeric(info[1]), value = round(max_value, 0), elements = max_value_elements)
   }
   
 #=== Return the answer found in either Parallel or not =========
