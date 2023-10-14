@@ -36,7 +36,7 @@ knapsack_objects <-
 # BRUTE FORCE SEARCH
 
 ```{r}
-x <- knapsack_objects[1:5,]
+x <- knapsack_objects[1:16,]
 W <- 3500
 ```
 
@@ -52,9 +52,8 @@ result
 
 # DYNAMMIC PROGRAMMING
 
-
 ```{r}
-x <- knapsack_objects[1:50,]
+x <- knapsack_objects[1:500,]
 W <- 3500
 ```
 
@@ -68,13 +67,7 @@ result
 ```
 
 ```{r}
-system.file("R", "rcpp_dynamic.R", package = "knapsack")
-```
-
-
-```{r}
 setwd("..")  #THIS WORKS BUT CAUSES THE PROBLEMS WITH KNIT
-#source(system.file("R", "rcpp_dynamic.R", package = "knapsack"))
 start_time <- Sys.time()
 result <- knapsack_dynamic(x, W, TRUE)
 end_time <- Sys.time()
