@@ -16,7 +16,7 @@
 #' knapsack_dynamic(x,W, fast = TRUE)
 
 knapsack_dynamic <- function(x, W, fast = FALSE){
-  source("rcpp_dynamic.R")
+  source("R/rcpp_dynamic.R")
   if (fast){
     x <-as.matrix(x)
     knapsack_dynamic_cpp(x, W)
@@ -58,3 +58,15 @@ knapsack_dynamic <- function(x, W, fast = FALSE){
   t <- list(value = max_value, elements = selected)
   return(t)
 }
+
+RNGversion(min(as.character(getRversion()),"3.5.3"))
+set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
+n <- 2000
+knapsack_objects <-
+  data.frame(
+    w=sample(1:4000, size = n, replace = TRUE),
+    v=runif(n = n, 0, 10000)
+  )
+
+knapsack_dynamic(x = knapsack_objects[1:20,], W = 3500)
+knapsack_dynamic(x = knapsack_objects[1:20,], W = 3500, fast = TRUE)
