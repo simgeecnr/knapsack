@@ -4,12 +4,14 @@
 \alias{knapsack_dynamic}
 \title{Dynammic Programming for Knapsack Problem}
 \usage{
-knapsack_dynamic(x, W)
+knapsack_dynamic(x, W, fast = FALSE)
 }
 \arguments{
 \item{x}{}
 
 \item{W}{}
+
+\item{fast}{An optional logical value to use rcpp (default is FALSE)}
 }
 \value{
 It returns the maximum value obtained and selected items.
@@ -22,6 +24,7 @@ Its computational complexity is O(Wn).
 x <- data.frame(v = c(10, 5, 15, 7, 6, 18), w = c(2, 3, 5, 7, 1, 4))
 W <- 15
 knapsack_dynamic(x,W)
+knapsack_dynamic(x,W, fast = TRUE)
 }
 \seealso{
 [Knapsack Problem](https://en.wikipedia.org/wiki/Knapsack_problem#0.2F1_knapsack_problem)

@@ -4,17 +4,23 @@
 #' Its computational complexity is O(Wn).
 #' @param x 
 #' @param W 
-#'
+#' @param fast An optional logical value to use rcpp (default is FALSE)
 #' @return It returns the maximum value obtained and selected items.
 #' @seealso [Knapsack Problem](https://en.wikipedia.org/wiki/Knapsack_problem#0.2F1_knapsack_problem)
 #' @export
 #'
 #' @examples
-#' x <- data.frame(v = c(10, 5, 15, 7, 6, 18), w = c(2, 3, 5, 7, 1, 4))
+#' x <- data.frame(w = c(2, 3, 5, 7, 1, 4), v = c(10, 5, 15, 7, 6, 18))
 #' W <- 15
 #' knapsack_dynamic(x,W)
+#' knapsack_dynamic(x,W, fast = TRUE)
 
-knapsack_dynamic <- function(x, W){
+knapsack_dynamic <- function(x, W, fast = FALSE){
+  source("R/rcpp_dynamic.R")
+  if (fast){
+    x <- as.matrix(x)
+    knapsack_dynamic_cpp(x, W)
+  }
   #Initialize the matrix
   n <- nrow(x)
   m <- matrix(0, n+1, W+1)
@@ -29,7 +35,6 @@ knapsack_dynamic <- function(x, W){
       }
     }
   }
-  
   i <- n+1
   w <- W+1
   max_value <- m[i,w]
@@ -50,5 +55,18 @@ knapsack_dynamic <- function(x, W){
   }
   
   selected <- which(list_idx == 1)
-  return(list(value = max_value, elements = selected))
+  t <- list(value = max_value, elements = selected)
+  return(t)
 }
+
+RNGversion(min(as.character(getRversion()),"3.5.3"))
+set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
+n <- 2000
+knapsack_objects <-
+  data.frame(
+    w=sample(1:4000, size = n, replace = TRUE),
+    v=runif(n = n, 0, 10000)
+  )
+
+knapsack_dynamic(x = knapsack_objects[1:20,], W = 3500)
+knapsack_dynamic(x = knapsack_objects[1:20,], W = 3500, fast = TRUE)
