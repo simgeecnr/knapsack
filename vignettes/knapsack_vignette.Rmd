@@ -33,9 +33,9 @@ knapsack_objects <-
   )
 ```
 
-# BRUTE FORCE SEARCH
+## BRUTE FORCE SEARCH
 
-The run time for brute force search algorithm is 4.23 seconds with n = 16.
+This approach is of complexity O(2^n) since all possible combinations 2n needs to be evaluated. The run time for brute force search algorithm is 4.23 seconds with n = 16. (Time may vary depending on your computing power)
 
 ```{r}
 x <- knapsack_objects[1:16,]
@@ -51,9 +51,10 @@ cat("Runtime:", runtime, "seconds\n")
 result
 ```
 
-# DYNAMMIC PROGRAMMING
+## DYNAMIC PROGRAMMING
 
-The run time for dynammic programming is 36.50 seconds with n = 500.
+This approach is of complexity O(Wn). The run time for dynamic programming is 36.50 seconds with n = 500. (Time may vary depending on your computing power)
+
 
 ```{r}
 x <- knapsack_objects[1:500,]
@@ -68,23 +69,29 @@ runtime <- end_time - start_time
 cat("Runtime without rcpp:", runtime, "seconds\n")
 result
 ```
-Using rcpp package executed the code faster and the runtime decreased from 36.50 seconds to 5.92 seconds.
+Using rcpp package, the code is executed faster and the run time decreased from 36.50 seconds to 5.92 seconds. (Time may vary depending on your computing power, but the improvement is proportional)
 
 ```{r}
 start_time <- Sys.time()
-result <- knapsack_dynamic(x, W, TRUE)
+result <- knapsack_dynamic(x, W, fast = TRUE)
 end_time <- Sys.time()
 runtime <- end_time - start_time
 cat("Runtime with rcpp:", runtime, "seconds\n")
 result
 ```
 
-# GREEDY HEURISTIC
+## GREEDY HEURISTIC
 
-The run time for greedy heuristics is 0.35 seconds with n = 1,000,000. This algorithm is really fast but it does not guarantee optimality unlike dynammic prgramming and brute force search algorithm
+This approach is of complexity O(n log(n)). The run time for greedy heuristics is 0.35 seconds with n = 1,000,000 (Time may vary depending on your computing power). This algorithm is really fast but it does not guarantee to find the best solution unlike dynamic programming and brute force search algorithm
 
 ```{r}
-x <- knapsack_objects[1:1000000,]
+m <- 1000000
+knapsack_million_objects <-
+  data.frame(
+    w=sample(1:4000, size = m, replace = TRUE),
+    v=runif(n = m, 0, 10000)
+  )
+x <- knapsack_million_objects[1:1000000,]
 W <- 3500
 ```
 
