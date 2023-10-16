@@ -21,7 +21,7 @@ Loading the necessary library
 library(knapsack)
 ```
 
-Generating data
+Generating the data
 ```{r}
 RNGversion(min(as.character(getRversion()),"3.5.3"))
 set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
@@ -35,11 +35,12 @@ knapsack_objects <-
 
 # BRUTE FORCE SEARCH
 
+The run time for brute force search algorithm is 4.23 seconds with n = 16.
+
 ```{r}
 x <- knapsack_objects[1:16,]
 W <- 3500
 ```
-
 
 ```{r}
 start_time <- Sys.time()
@@ -52,8 +53,10 @@ result
 
 # DYNAMMIC PROGRAMMING
 
+The run time for dynammic programming is 36.50 seconds with n = 500.
+
 ```{r}
-x <- knapsack_objects[1:50,]
+x <- knapsack_objects[1:500,]
 W <- 3500
 ```
 
@@ -65,9 +68,9 @@ runtime <- end_time - start_time
 cat("Runtime without rcpp:", runtime, "seconds\n")
 result
 ```
+Using rcpp package executed the code faster and the runtime decreased from 36.50 seconds to 5.92 seconds.
 
 ```{r}
-#setwd("..")  #THIS WORKS BUT CAUSES THE PROBLEMS WITH KNIT
 start_time <- Sys.time()
 result <- knapsack_dynamic(x, W, TRUE)
 end_time <- Sys.time()
@@ -77,6 +80,8 @@ result
 ```
 
 # GREEDY HEURISTIC
+
+The run time for greedy heuristics is 0.35 seconds with n = 1,000,000. This algorithm is really fast but it does not guarantee optimality unlike dynammic prgramming and brute force search algorithm
 
 ```{r}
 x <- knapsack_objects[1:1000000,]
